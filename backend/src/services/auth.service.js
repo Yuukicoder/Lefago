@@ -17,7 +17,7 @@ export const Register = async ({email, password, role}) =>{
 export const Login = async({email, password}) =>{
     const user = await User.findOne({email});
     if(!user) throw new Error("Invalid user");
-    const isMatch = bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if(!isMatch) throw new Error("Password is not matched");
     // lưu token vào db
     const accessToken = generateAccessToken(user);
