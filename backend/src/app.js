@@ -2,6 +2,8 @@ import express from "express"
 import cors from "cors"
 import morgan from "morgan"
 import router from "./routes/index.js"
+import { errorHandler } from "./middlewares/errorHandler.js"
+import { notFoundMiddleWare } from "./middlewares/notFound.middleware.js"
 const app = express();
 
 app.use(cors());
@@ -13,6 +15,10 @@ app.get("/", (req, res) =>{
     res.send("API running ...");
 });
 app.use(router);
+app.use(errorHandler);
+app.use(notFoundMiddleWare);
 
 
 export default app;
+
+
