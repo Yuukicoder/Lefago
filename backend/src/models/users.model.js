@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
+        fullname: {
+            type: String, 
+            required: true,
+        },
         email: {
             type: String,
             required: true,
@@ -11,7 +15,7 @@ const userSchema = new mongoose.Schema({
         },
         role: {
             type: String,
-            enum: ["admin", "user"],
+            enum: ["admin", "user", "reviewer"],
             default: "user",
         },
         refreshToken: {type: String},
