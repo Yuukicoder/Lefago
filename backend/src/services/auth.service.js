@@ -34,12 +34,12 @@ export const Login = async({email, password}) =>{
 } 
 // cấp lại accessToken mới khi hết hạn
 export const RefreshToken = async (token)=>{
-    if(!token) throw new Error("No refresh token");
+    if(!token) throw createHttpError(401,"No refresh token");
     //  check refreshToken client có trùng vs refreshToken của server ko?
     const payload = verifyToken(token, process.env.JWT_REFRESH_SECRET);
     console.log(process.env.JWT_REFRESH_SECRET);
     console.log("payload", payload);
-    if(!payload) throw new Error("Invalid refresh token");
+    if(!payload) throw createHttpError(401,"Invalid refresh token");
     const user = await User.findById(payload.id);
     console.error("User:",user._id);
     if(!user || user.refreshToken !== token)

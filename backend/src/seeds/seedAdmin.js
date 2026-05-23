@@ -12,6 +12,7 @@ const seedAdmin = async () =>{
         if(existed) throw new Error("Email admin already existed!");
         const hash_password = await bcrypt.hash("admin123", 10);
         const newAdmin = new User({
+            fullname: "Admin",
             email: email,
             password: hash_password,
             role:  "admin",

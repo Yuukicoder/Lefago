@@ -1,9 +1,9 @@
-import jwt from '../utils/jwt.js'
+import {verifyToken} from '../utils/jwt.js'
 import createError from 'http-errors'
 export const authMiddleware = async (req, res, next) => {
   try {
     // logic here
-    const authHeader = req.header.authorization || "";
+    const authHeader = req.headers.authorization || "";
     if(!authHeader || !authHeader.startsWith("Bearer"))
     {
       return res.status(401).json({
@@ -11,9 +11,10 @@ export const authMiddleware = async (req, res, next) => {
         message: "Unauthorize"
       })
     }
-    const decode = jwt.verify(req.token, process.env.JWT_REFRESH_SECRET);
+    const token = authHeader.split(" ")[1];
+    const decode = verifyToken(token, process.env.JWT_ACCESS_SECRET);
     console.log("authMiddleware_decode:",decode);
-    decode = req.user;
+    req.user = decode;
     next();
   } catch (error) {
     next(createError(401, "Invalid or expired token"));
