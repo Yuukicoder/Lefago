@@ -23,12 +23,12 @@ export const addDestination = async (data, userId) => {
    {
       throw createHttpError(409, "Slug destination is already existed!");
    }
-   const user = await User.findById(userId);
   const result = await Destination.create({
     ...data,
     slug,
-    createdBy: user.fullname,
+    createdBy: userId,
   })
+  await result.populate("createdBy", "fullname email");
   return result;
 };
 
@@ -84,36 +84,39 @@ export const deleteDestinationById = async (id) => {
   return result;
 };
 
-export const getDestination = async (query) => {
-  // logic here
-  const {keyword, region, page = 1, limit = 10} = query;
+
+ export const getDestination = async (query) => {
+   // logic here
+   const {keyword, region, page = 1, limit = 10} = query;
+  //  Filter+Search
   const filter = {};
-  if(keyword){
-    filter.$or = [
-      {name: {$regex: keyword, $options: "i"}},
-      {description: {$regex: keyword, $options: "i"}},
-      {region: {$regex: keyword, $options: "i"}}
+  if(keyword) {
+    filter.$or=[
+      {name: {$regex: keyword, $options: 'i'}},
+      {description: {$regex: keyword, $options: 'i'}},
+      {region: {$regex: keyword, $options: 'i'}},
     ]
   }
   if(region){
-    filter.region = {$regex: region, $options: "i"}
+    filter.region =  {$regex: region, $options: "i"}
   }
+  // Pagination
   const pageNumber = Number(page);
   const limitNumber = Number(limit);
   const skip = (pageNumber-1)*limitNumber;
   const data = await Destination.find(filter)
-                          .sort({createAt: -1})
-                          .skip(skip)
-                          .limit(limitNumber)
-                          .lean();
-  if(!data || data.length === 0){
-    throw createHttpError(404, "Do not have any destination!");
+                                .sort({createdAt: -1})
+                                .skip(skip)
+                                .limit(limitNumber)
+                                .lean();
+  if(!data || data.length === 0) {
+    throw createHttpError(404, "Do not have any destination!")
   }
   const total = await Destination.countDocuments(filter);
   return {
-    data, 
-    pagination: {
-      total, 
+    data,
+    pagination : {
+      total,
       page: pageNumber,
       limit: limitNumber,
       totalPage: Math.ceil(total/limitNumber)

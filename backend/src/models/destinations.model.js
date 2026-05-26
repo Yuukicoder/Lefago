@@ -12,7 +12,7 @@ const destinationSchema = new mongoose.Schema({
     long: {type: Number},
     region: {type: String},
     thumbnail: {type: String},
-    createdBy: {type:String, required: true}
+    createdBy: {type:mongoose.Schema.Types.ObjectId, ref:"User"}
 },{
     timestamps: true
 }
