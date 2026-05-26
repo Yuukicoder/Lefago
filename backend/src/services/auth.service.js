@@ -1,4 +1,4 @@
-import User from "../models/index.js";
+import User from "../models/users.model.js";
 import bcrypt from "bcryptjs";
 import {generateAccessToken, generateRefreshToken, verifyToken} from "../utils/jwt.js"
 import createHttpError from "http-errors";
