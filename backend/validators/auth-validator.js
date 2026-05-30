@@ -10,7 +10,7 @@ export const registerSchema = z.object({
     .refine((value) => !/\s/.test(value), {
         message: "Password must not contain spaces"
     }),
-    
+    role: z.enum(["admin", "user", "reviewer", "shop"])
 
 })
 
