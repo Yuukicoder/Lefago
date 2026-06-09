@@ -11,8 +11,11 @@ const shopMediaSchema = new mongoose.Schema(
         type: String, 
         required: true,
     },
+    uploaded_by: {
+      type: mongoose.Schema.Types.ObjectId, ref:"User"
+    }
   },
   { timestamps: true }
 );
-
+shopMediaSchema.index({shop_id: 1});
 export default mongoose.model('ShopMedia', shopMediaSchema, "shop_media");
