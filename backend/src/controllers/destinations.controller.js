@@ -1,7 +1,7 @@
 import * as Destination from '../services/destination.service.js';
 import * as DestinationMedia from '../services/destinationMedia.service.js';
 
-// - CRUD destination
+// API: POST-create destination
 export const addDestination = async (req, res, next) => {
   try {
     // logic here
@@ -14,7 +14,7 @@ export const addDestination = async (req, res, next) => {
     next(error);
   }
 };
-
+// API: GET-get destination by id
 export const getDestinationById = async (req, res, next) => {
   try {
     // logic here
@@ -28,7 +28,7 @@ export const getDestinationById = async (req, res, next) => {
     next(error);
   }
 };
-
+// API: GET-get destination by slug
 export const getDestinationBySlug = async (req, res, next) => {
   try {
     // logic here
@@ -42,7 +42,7 @@ export const getDestinationBySlug = async (req, res, next) => {
     next(error);
   }
 };
-
+// API: PUT-update destination by id
 export const updateDestinationById = async (req, res, next) => {
   try {
     // logic here
@@ -56,6 +56,7 @@ export const updateDestinationById = async (req, res, next) => {
     next(error);
   }
 };
+// API: DELETE-delete destination by id
 export const deleteDestinationById = async (req, res, next) => {
   try {
     // logic here
@@ -69,7 +70,7 @@ export const deleteDestinationById = async (req, res, next) => {
     next(error);
   }
 };
-// - Search / filter cơ bản
+// API: GET-get destination [Search, filter, pagination]
 export const getDestination = async (req, res, next) => {
   try {
     // logic here [Filter + Search + Pagination]
@@ -83,7 +84,7 @@ export const getDestination = async (req, res, next) => {
   }
 };
 
-// - Add image cho destination
+// API: POST-add media (image,video) for destination (destination media)
 export const addImageDestination = async (req, res, next) => {
   try {
     // logic here
@@ -98,7 +99,7 @@ export const addImageDestination = async (req, res, next) => {
     next(error);
   }
 };
-// - Get media theo destination
+// API: GET-get media (image, video) by destination id
 export const getDestinationMedia = async (req, res, next) => {
   try {
     // logic here
@@ -112,7 +113,7 @@ export const getDestinationMedia = async (req, res, next) => {
     next(error);
   }
 };
-// - Delete media
+// API: DELETE-delete media
 export const deleteMedia = async (req, res, next) => {
   try {
     // logic here

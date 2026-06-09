@@ -3,6 +3,7 @@ import createHttpError from 'http-errors';
 import mongoose from 'mongoose';
 import Destination from '../models/destinations.model.js';
 import slugify from 'slugify';
+import User from '../models/users.model.js';
 export const getShop = async (query) => {
   // logic here
   const {keyword, type,destination_id, page = 1, limit = 10} = query;
@@ -11,7 +12,11 @@ export const getShop = async (query) => {
     filter.$or = [
       {name: {$regex: keyword, $options: "i"}},
       {address: {$regex: keyword, $options: "i"}},
-      {description: {$regex: keyword, $options: "i"}}
+      {description: {$regex: keyword, $options: "i"}}, 
+      {"contact.phone": {$regex: keyword, $options: "i"}},
+      {"contact.email": {$regex: keyword, $options: "i"}},
+      {"contact.facebook": {$regex: keyword, $options: "i"}},
+      {"contact.website": {$regex: keyword, $options: "i" }}
     ]}
   if(type){
     filter.type = type
@@ -27,10 +32,10 @@ export const getShop = async (query) => {
   const skip = (pageNumber-1)*limitNumber;
   const data = await Shop.find(filter)
                           .populate("destination_id", "name slug")
-                          .populate("user_id", "fullname email")
+                          .populate("user_id", "fullname")
                           .sort({createdAt: -1})
                           .skip(skip)
-                          .limit(limit)
+                          .limit(limitNumber)
                           .lean()
   if(!data || data.length === 0) {
     throw createHttpError(400, "Do not have any shop")
@@ -46,7 +51,7 @@ export const getShop = async (query) => {
     thumbnail: shop.thumbnail,
     destination: shop.destination_id.name,
     owner: shop.user_id.fullname,
-    contact: shop.user_id.email,
+    contact: shop.contact,
   }))
   return {
     data: formattedData, 
@@ -57,14 +62,8 @@ export const getShop = async (query) => {
       totalPage: Math.ceil(total/limitNumber)
     }
   }
-
-
-  const result = await Shop.find().lean();
-  if(!result || result.length === 0){
-    throw createHttpError(400, "Do not have any shop!");
-  }
-  return result;
 };
+
 
 export const addShop = async (destinationId, data, userId) => {
   // logic here
@@ -75,14 +74,15 @@ export const addShop = async (destinationId, data, userId) => {
   if(!destination){
     throw createHttpError(400, "Do not have any destination!")
   }
-  const slug = slugify(data.name, {
+  const slug = slugify(`${data.name}-${data.address || destination.name}`, {
     strict: true,
     lower: true,
     locale: "vi",
   })
-  const slugExisted = await Shop.findOne({slug}).lean();
-  if(slugExisted) {
-    throw createHttpError(409, "Slug shop is already existed!");
+  const existed = await Shop.findOne({name: data.name, destination_id: destinationId, address: data.address}).lean();
+  console.log(existed);
+  if(existed){
+    throw createHttpError(409, "Shop already exist in this destination!")
   }
   const result = await Shop.create({
       destination_id: destinationId,
@@ -92,7 +92,8 @@ export const addShop = async (destinationId, data, userId) => {
     type: data.type,
     address: data.address,
     description: data.description,
-    thumbnail: data.thumbnail
+    thumbnail: data.thumbnail,
+    contact: data.contact
   })
   return result;
 };
@@ -103,9 +104,29 @@ export const getShopByDestinationId = async (desId) => {
   if(!mongoose.Types.ObjectId.isValid(desId)){
     throw createHttpError(400, "Invalid DestinationId")
   }
-  const result = await Shop.find({destination_id: desId}).sort({createdAt: -1}).lean();
+  const result = await Shop.find({destination_id: desId}).populate("destination_id", "name slug").populate("user_id", "fullname email").sort({createdAt: -1}).lean();
   if(!result || result.length === 0) {
     throw createHttpError(400, "Do not have any shop in this destination!")
+  }
+  const formattedResult  = result.map(shop => ({
+    name: shop.name,
+    slug: shop.slug, 
+    type: shop.type,
+    address: shop.address,
+    description: shop.description,
+    thumbnail: shop.thumbnail,
+    destination:shop.destination_id.name,
+    owner: shop.user_id.fullname,
+    contact: shop.contact
+  }))
+  return formattedResult;
+};
+
+export const getShopBySlug = async (slug) => {
+  // logic here
+  const result = await Shop.findOne({slug}).populate("destination_id", "name").populate("user_id", "fullname").lean();
+  if(!result){
+    throw createHttpError(400, "Do not have any shop!")
   }
   return result;
 };
@@ -117,25 +138,30 @@ export const updateShop = async (shopId,userId, data) => {
   }
   const existed = await Shop.findById(shopId).lean();
   if(!existed) {
-    throw createHttpError(400, "Do not have any shop")
+    throw createHttpError(404, "Do not have any shop")
   }
 
   if(userId !== existed.user_id.toString()){
     throw createHttpError(403, "You cannot access!")
   }
   if(data.name !== existed.name){
-    data.slug = slugify(data.name, {
+    const slug = slugify(`${data.name}-${data.address ||  existed.destination_id}`, {
       strict: true,
       lower: true,
       locale: "vi",
     })
+    const slugExisted = await Shop.findOne({slug, _id: {$ne: shopId},}).lean();
+    if(slugExisted) {
+      throw createHttpError(409, "Shop slug already exists");
+    }
+    data.slug = slug;
   }
   const result = await Shop.findByIdAndUpdate(shopId, data, 
     {
       new: true,
       runValidators: true,
     }
-  )
+  ).populate("user_id", "fullname ")
   return result;
 };
 
@@ -146,7 +172,7 @@ export const deleteShop = async (shopId, userId) => {
   }
   const existed = await Shop.findById(shopId).lean();
   if(!existed){
-    throw createHttpError(400, "Do not have any shop")
+    throw createHttpError(404, "Do not have any shop")
   }
   console.log(userId, existed.user_id.toString());
   if(userId !== existed.user_id.toString()){
@@ -155,3 +181,4 @@ export const deleteShop = async (shopId, userId) => {
   const result = await Shop.findByIdAndDelete(shopId).lean();
   return result;
 };
+

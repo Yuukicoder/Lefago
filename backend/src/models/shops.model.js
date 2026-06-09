@@ -24,6 +24,24 @@ const shopSchema = new mongoose.Schema(
     },
     thumbnail: {
         type: String
+    }, 
+    contact: {
+      phoneNumber: {
+        type: String, 
+        trim: true
+      }, 
+      email: {
+        type: String, 
+        trim: true
+      },
+      facebook: {
+        type: String, 
+        trim: true
+      }, 
+      website: {
+        type: String, 
+        trim: true,
+      }
     }
   },
   { timestamps: true }

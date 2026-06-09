@@ -1,5 +1,5 @@
 import * as authService from "../services/auth.service.js";
-// Register
+// API: POST-Register
 export const Register = async (req, res, next) =>{
     const {fullname, email, password, role} = req.body;
     try {
@@ -9,7 +9,7 @@ export const Register = async (req, res, next) =>{
         next(error);
     }
 }
-// Login
+// API: POST-Login
 export const Login = async (req, res, next) =>{
     const {email, password} = req.body;
     try {
@@ -25,7 +25,7 @@ export const Login = async (req, res, next) =>{
         next(error);
     }
 }
-// RefreshToken
+// API: POST-RefreshToken
 export const RefreshToken = async(req, res, next) =>{
     const {refreshToken} = req.body;
     try {
@@ -35,7 +35,7 @@ export const RefreshToken = async(req, res, next) =>{
         next(error);
     }
 }
-// Logout
+// API: POST-Logout
 export const Logout = async(req, res, next) =>{
     try {
         await authService.Logout(req.user._id);

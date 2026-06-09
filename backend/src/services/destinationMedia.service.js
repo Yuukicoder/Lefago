@@ -13,6 +13,10 @@ export const addImageDestination = async (desId, data, userId) => {
   if(!destination) {
     throw createHttpError(404, "Do not have any destination!")
   }
+  const existedUrl = await DestinationMedia.findOne({url: data.url}).lean();
+  if(existedUrl){
+    throw createHttpError(409, "URL is already existed")
+  }
   const result = await DestinationMedia.create({
     destination_id: desId,
     type: data.type || "image",
