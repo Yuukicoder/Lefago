@@ -98,12 +98,12 @@ export const addMediaShop = async (req, res, next) => {
     next(error);
   }
 };
-// API: GET-get media by shop Id 
+// API: GET-get media by shop Id [Filter, Pagination]
 export const getMediaShop = async (req, res, next) => {
   try {
     // logic here
     const {id} = req.params;
-    const result = await ShopMedia.getMediaShop(id);
+    const result = await ShopMedia.getMediaShop(id, req.query);
     res.status(200).json({
       message: 'Success',
       data: result
@@ -118,6 +118,20 @@ export const deleteMediaShop = async (req, res, next) => {
     // logic here
     const {mediaId} = req.params;
     const result = await ShopMedia.deleteMediaShop(mediaId, req.user.id)
+    res.status(200).json({
+      message: 'Success',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// API: POST-upload media by multer
+export const uploadShopMedia = async (req, res, next) => {
+  try {
+    // logic here
+    const {id} = req.params;
+    const result = await ShopMedia.uploadShopMedia(id, req.file, req.user.id, req);
     res.status(200).json({
       message: 'Success',
       data: result
