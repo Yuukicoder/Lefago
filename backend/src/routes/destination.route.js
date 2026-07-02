@@ -1,10 +1,11 @@
 import express from 'express';
-import { getDestination, addDestination, getDestinationById, getDestinationBySlug, updateDestinationById, deleteDestinationById, addImageDestination, getDestinationMedia, deleteMedia} from '../controllers/destinations.controller.js';
+import { getDestination, addDestination, getDestinationById, getDestinationBySlug, updateDestinationById, deleteDestinationById, addImageDestination, getDestinationMedia, deleteMedia, uploadDestinationMedia} from '../controllers/destinations.controller.js';
 import {authMiddleware} from '../middlewares/auth.middleware.js';
 import {authorizeRoles} from '../middlewares/authorizeRoles.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { addDestinationSchema, updateDestinationSchema } from '../../validators/destination-validator.js';
 import {addImageDestinationSchema} from '../../validators/destinationMedia-validator.js';
+import { upload } from '../middlewares/upload.middleware.js';
 const router = express.Router();
 
 router.get('/', getDestination);
@@ -19,4 +20,5 @@ router.delete('/:id', deleteDestinationById);
 router.post('/:id/media', authMiddleware, authorizeRoles("admin"), validate(addImageDestinationSchema), addImageDestination);
 router.get('/:id/media',  getDestinationMedia);
 router.delete('/media/:mediaId', deleteMedia);
+router.post('/:id/media/upload', authMiddleware, authorizeRoles("admin"), upload.single("media"), uploadDestinationMedia)
 export default router;

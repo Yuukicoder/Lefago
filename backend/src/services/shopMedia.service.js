@@ -3,6 +3,7 @@ import ShopMedia from '../models/shopMedias.model.js';
 import Shop from '../models/shops.model.js';
 import createHttpError from 'http-errors';
 import User from '../models/users.model.js';
+import { UploadCloudinaryMedia } from './media-upload.service.js';
 
 export const addMediaShop = async (shopId, data, userId) => {
   // logic here
@@ -103,20 +104,11 @@ export const deleteMediaShop = async (mediaId, userId) => {
 };
 
 
-export const uploadShopMedia = async (shopId, file, userId, req) => {
+export const uploadShopMedia = async (shopId, file, userId) => {
   // logic here
-  if(!file){
-    throw createHttpError(400, "Invalid file")
+  if(!mongoose.Types.ObjectId.isValid(shopId)){
+    throw createHttpError(400, "Invalid shop Id")
   }
-  const mediaType = file.mimetype.startsWith("video/")?"video":"image";
-  const mediaUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
-  const result = await addMediaShop(
-    shopId,
-    {
-      type: mediaType,
-      url: mediaUrl
-    },
-    userId
-  )
-  return result;
-};
+  const uploaded = await UploadCloudinaryMedia(file, `lefago/shop-media/${shopId}`);
+  return await addMediaShop(shopId, uploaded, userId)
+}; 

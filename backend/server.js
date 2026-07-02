@@ -1,4 +1,5 @@
 import "./src/config/env.js"
+import "./src/config/cloudinary.config.js"
 import app from "./src/app.js"
 import db from "./src/config/db.js"
 const PORT = process.env.PORT || 5000;
