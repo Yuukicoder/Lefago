@@ -3,7 +3,8 @@ import createHttpError from 'http-errors';
 import Destination from '../models/destinations.model.js';
 import DestinationMedia from '../models/destinationMedias.model.js';
 import User from '../models/users.model.js';
-export const addImageDestination = async (desId, data, userId) => {
+import { UploadCloudinaryMedia } from './media-upload.service.js';
+export const addMediaDestination = async (desId, data, userId) => {
   // logic here
   console.log(desId);
   if(!mongoose.Types.ObjectId.isValid(desId)){
@@ -48,4 +49,13 @@ export const deleteMedia = async (mediaId) => {
     throw createHttpError(400, "Do not have any Destination Media!")
   }
   return result;
+};
+
+export const uploadDestinationMedia = async (desId, file, userId) => {
+  // logic here
+  if(!mongoose.Types.ObjectId.isValid(desId)){
+    throw createHttpError(400, "Invalid destination Id")
+  }
+  const uploaded = await UploadCloudinaryMedia(file, `lefago/destination/${desId}`);
+  return await addMediaDestination(desId, uploaded, userId)
 };

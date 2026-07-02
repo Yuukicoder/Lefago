@@ -90,7 +90,7 @@ export const addImageDestination = async (req, res, next) => {
     // logic here
     const {id} = req.params;
     console.log("desId", id);
-    const result = await DestinationMedia.addImageDestination(id, req.body, req.user.id)
+    const result = await DestinationMedia.addMediaDestination(id, req.body, req.user.id)
     res.status(200).json({
       message: 'Success',
       data: result
@@ -119,6 +119,20 @@ export const deleteMedia = async (req, res, next) => {
     // logic here
     const {mediaId} = req.params;
     const result = await DestinationMedia.deleteMedia(mediaId);
+    res.status(200).json({
+      message: 'Success',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// API: POST-upload destination media
+export const uploadDestinationMedia = async (req, res, next) => {
+  try {
+    // logic here
+    const {id} = req.params;
+    const result = await DestinationMedia.uploadDestinationMedia(id, req.file, req.user.id);
     res.status(200).json({
       message: 'Success',
       data: result

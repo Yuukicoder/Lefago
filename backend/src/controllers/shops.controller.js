@@ -131,7 +131,7 @@ export const uploadShopMedia = async (req, res, next) => {
   try {
     // logic here
     const {id} = req.params;
-    const result = await ShopMedia.uploadShopMedia(id, req.file, req.user.id, req);
+    const result = await ShopMedia.uploadShopMedia(id, req.file, req.user.id);
     res.status(200).json({
       message: 'Success',
       data: result
