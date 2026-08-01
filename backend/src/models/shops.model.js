@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 const shopSchema = new mongoose.Schema(
   {
-    user_id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     destination_id: {type: mongoose.Schema.Types.ObjectId, ref:"Destination"},
     name: {
       type: String,
@@ -42,9 +41,20 @@ const shopSchema = new mongoose.Schema(
         type: String, 
         trim: true,
       }
+    },
+    status: {
+      type: String,
+      enum: ["pending", "active", "rejected", "suspended"],
+      default: "pending"
     }
   },
   { timestamps: true }
 );
-shopSchema.index({destination_id:1});
+shopSchema.index(
+  {
+    destination_id:1,
+    slug: 1
+  }, {
+    unique: true
+  });
 export default mongoose.model('Shop', shopSchema);
